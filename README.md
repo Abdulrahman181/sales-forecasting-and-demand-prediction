@@ -1,153 +1,39 @@
-#  Sales and Demand Forecasting using Machine Learning & Deep Learning
+# Sales Forecasting and Demand Prediction
 
-This project aims to build predictive models for forecasting **retail sales (Units Sold)** and **demand (Demand Forecast)** using both **traditional machine learning models**, **deep learning models**, and **time series forecasting techniques**.
+This repository contains a Streamlit demo, a saved Keras model, a Jupyter notebook, and project documentation for a retail sales and demand forecasting project.
 
-Effective forecasting of sales and demand is essential for businesses to optimize inventory management, improve customer satisfaction, and streamline their supply chain.
+## Repository contents
 
----
+- `App/streamlit_app.py` and `App/best_demand_forecast_model.keras` — demo UI and saved model.
+- `notebooks/Sales_Forecasting_and_Demand_Prediction.ipynb` — exploratory analysis and modeling notebook.
+- `ML flow.py` — MLflow experiment code that expects training and test variables to have already been prepared.
+- `src/Final Doc.pdf` and `src/Final Presentation.pdf` — project deliverables.
+- `src/requirements` — pinned Python dependencies for the project and app.
 
-##  About the Dataset
+## Run the Streamlit demo
 
-The dataset contains over **73,000 daily records** across multiple stores and products. It includes the following features:
+Use Python 3.11 in a virtual environment. From the repository root:
 
-- **Sales** (Units Sold)
-- **Demand** (Demand Forecast)
-- **Inventory levels**
-- **Pricing**
-- **Weather data**
-- **Promotions**
-- **Holidays**
-- **Product and store information**
-- **Date/Time** features
+```bash
+python -m venv .venv
+# Linux/macOS: source .venv/bin/activate
+# Windows PowerShell: .\\.venv\\Scripts\\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r src/requirements
+streamlit run App/streamlit_app.py
+```
 
-The dataset is ideal for tasks such as:
+The app resolves its bundled model relative to its own source file, so it does not depend on the shell's current directory. See [`Deployment`](Deployment) for the same launch instructions.
 
-- Demand and sales forecasting
-- Time series analysis
-- Dynamic pricing strategies
-- Inventory optimization
+## Notebook data
 
----
+The notebook references the [Retail Store Inventory Forecasting Dataset on Kaggle](https://www.kaggle.com/datasets/anirudhchauhan/retail-store-inventory-forecasting-dataset), but the dataset is **not included** in this repository. The notebook looks by default for `data/retail_store_inventory.csv` relative to the notebook process's current directory. To use another location, set `RETAIL_DATA_PATH` to the CSV path before starting Jupyter. The notebook stops with a clear missing-file error rather than relying on a machine-specific Windows path.
 
-##  Project Objectives
+Do not commit private datasets, credentials, or locally generated files to this repository.
 
-The main objectives of this project include:
+## Reproducibility and limitations
 
-1. **Predicting future Units Sold** and **Demand Forecast** for different products across stores.
-2. **Evaluating a wide range of machine learning, deep learning, and time series models** for both sales and demand forecasting.
-3. **Comparing model performances** using evaluation metrics such as MAE, MSE, RMSE, and R².
-4. **Understanding the impact of external factors** like weather and promotions on sales and demand trends.
-
----
-
-##  Models Used
-
-The project involves using a combination of **machine learning models**, **deep learning models**, and **time series models** for sales and demand forecasting. Below is the detailed list of models used:
-
-###  **Machine Learning Models**
-- `XGBRegressor - Units Sold`
-- `XGBRegressor - Demand Forecast`
-- `RandomForestRegressor - Units Sold`
-- `RandomForestRegressor - Demand Forecast`
-- `GradientBoostingRegressor - Units Sold`
-- `GradientBoostingRegressor - Demand Forecast`
-- `SVR - Units Sold`
-- `SVR - Demand Forecast`
-- `Ridge Regression - Units Sold`
-- `Ridge Regression - Demand Forecast`
-
-###  **Deep Learning Models**
-- `MLP - Sales Prediction`
-- `MLP - Demand Forecast Prediction`
-- `LSTM - Sales Prediction`
-- `LSTM - Demand Forecast Prediction`
-- `BiLSTM - Sales Prediction`
-- `BiLSTM - Demand Forecast Prediction`
-- `CNN - Sales Prediction`
-- `CNN - Demand Forecast Prediction`
-- `CNN+LSTM - Sales Prediction`
-- `CNN+LSTM - Demand Forecast Prediction`
-- `BiLSTM+CNN - Sales Prediction`
-- `BiLSTM+CNN - Demand Forecast Prediction`
-
-###  **Time Series Models**
-- `Prophet - Units Sold`
-- `Prophet - Demand Forecast`
-- `ARIMA - Units Sold`
-- `ARIMA - Demand Forecast`
-- `SARIMAX - Units Sold`
-- `SARIMAX - Demand Forecast`
-
----
-
-##  Evaluation Metrics
-
-Models were evaluated using the following metrics:
-
-- **MAE (Mean Absolute Error)**
-- **MSE (Mean Squared Error)**
-- **RMSE (Root Mean Squared Error)**
-- **R² Score**
-
-These metrics help assess model performance in terms of accuracy and error minimization. The higher the R² and the lower the error metrics, the better the model.
-
----
-
-##  Top Model Performance
-
-Here are the best-performing models based on the evaluation metrics:
-
-| Model                            | Target              | MAE      | MSE       | RMSE     | R² Score   |
-|----------------------------------|----------------------|----------|-----------|----------|------------|
-| **MLP**                          | Demand Forecast      | 0.004381 | 0.000037  | 0.006100 | **0.999308** |
-| **BiLSTM + CNN**                 | Sales Prediction     | 0.004398 | 0.000044  | 0.006643 | **0.999232** |
-
->  These two models showed remarkable performance, with near-perfect R² scores, making them the top models for demand and sales forecasting.
-
----
-
-##  Visualizations
-
-To aid in model evaluation and analysis, various visualizations were created:
-
-- **Actual vs Predicted Plots** for both Units Sold and Demand Forecast.
-- **Feature Importance** for machine learning models.
-- **Correlation Heatmaps** to visualize relationships between features.
-- **Sales and Demand Trends** by time, store, and product.
-- **Impact of Holidays and Promotions** on sales and demand.
-
-These visualizations provide insights into model performance and help in interpreting the results of forecasting.
-
----
-
-##  Tools & Libraries
-
-The following tools and libraries were used throughout the project:
-
-- **Data Preprocessing & Analysis**: `Pandas`, `NumPy`
-- **Machine Learning**: `Scikit-learn`, `XGBoost`, `LightGBM`
-- **Deep Learning**: `Keras`, `TensorFlow`, `PyTorch`
-- **Time Series Models**: `Prophet`, `statsmodels`
-- **Visualization**: `Matplotlib`, `Seaborn`, `Plotly`
-- **Notebooks**: Jupyter Notebook
-
----
-
-##  Project Structure
-
-The project is organized into the following structure:
-Sales_Demand_Forecasting/
-
-│
-
-├── datasets/  Raw and processed datasets
-
-├── notebooks/  Comprehensive documentation of the project, more specialized in how it works.
-
-├── Final Doc/  Trained model files
-
-├── src/  Python scripts for preprocessing and modeling
-
-├── visuals/  Plots and figures
-
-└── README.md  Project documentation
+- The saved model is present, but its loading and predictions were not validated in this repository checkout. TensorFlow is required to run the app.
+- No training dataset or prepared train/test split is checked in. Consequently, model metrics and training results cannot be independently reproduced from this checkout. No performance claim is made here.
+- `ML flow.py` is not a standalone training entry point: it references data/model variables expected to exist in a prepared notebook session. The notebook and model results should be reviewed before using predictions for operational decisions.
+- This demo is for exploration only, not a validated production forecasting service.
