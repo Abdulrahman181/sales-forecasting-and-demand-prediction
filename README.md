@@ -1,153 +1,52 @@
-#  Sales and Demand Forecasting using Machine Learning & Deep Learning
+# Sales Forecasting and Demand Prediction
 
-This project aims to build predictive models for forecasting **retail sales (Units Sold)** and **demand (Demand Forecast)** using both **traditional machine learning models**, **deep learning models**, and **time series forecasting techniques**.
+This repository contains a **leakage-aware, reproducible baseline** for jointly forecasting `Units Sold` and `Demand Forecast`, plus a Streamlit UI for the committed Keras artifact.
 
-Effective forecasting of sales and demand is essential for businesses to optimize inventory management, improve customer satisfaction, and streamline their supply chain.
+## Data is required
 
----
+The dataset is **not committed**. The pipeline never creates synthetic data or silently falls back to another file. Supply the original Retail Store Inventory Forecasting CSV yourself:
 
-##  About the Dataset
+```bash
+python "ML flow.py" --data /absolute/path/to/retail_store_inventory.csv \
+  --metrics artifacts/metrics.json --artifact artifacts/forecasting.joblib
+```
 
-The dataset contains over **73,000 daily records** across multiple stores and products. It includes the following features:
+The CSV must contain `Date`, `Units Sold`, and `Demand Forecast`. Other columns are treated as candidate predictors. The loader validates dates and numeric targets, sorts chronologically, and fails with an actionable message when the path or schema is invalid.
 
-- **Sales** (Units Sold)
-- **Demand** (Demand Forecast)
-- **Inventory levels**
-- **Pricing**
-- **Weather data**
-- **Promotions**
-- **Holidays**
-- **Product and store information**
-- **Date/Time** features
+## Reproducible training design
 
-The dataset is ideal for tasks such as:
+- Uses a **chronological holdout** (last 20% of rows) rather than a random split.
+- Fits imputation, scaling, and one-hot encoding on the training partition only.
+- Removes target columns and known target-derived fields (`Inventory_Demand`, `UnitsSold_Price`) from features.
+- Uses a fixed `random_state=42` and reports MAE, RMSE, R², row counts, and train/test date boundaries.
+- Does not claim the historical near-perfect scores in older project documents: those results were not reproducible here and the original notebook had leakage and random-split issues.
 
-- Demand and sales forecasting
-- Time series analysis
-- Dynamic pricing strategies
-- Inventory optimization
+## Streamlit application
 
----
+The UI expects five features matching the committed artifact's historical contract: `Inventory Level`, `Price`, `Seasonality_Summer`, `Inventory_Demand`, and `UnitsSold_Price`. The latter two are user-supplied inputs and should be treated as potentially target-derived; retraining with a documented, future-available feature contract is recommended.
 
-##  Project Objectives
+```bash
+pip install -r requirements.txt
+streamlit run App/streamlit_app.py
+# Optional artifact override:
+MODEL_PATH=/absolute/path/to/model.keras streamlit run App/streamlit_app.py
+```
 
-The main objectives of this project include:
+The app resolves the default model relative to `App/`, checks the artifact before loading, loads TensorFlow lazily, validates input/output shapes, and stops with a clear error instead of guessing. The committed artifact has not been executed in this audit because TensorFlow is not installed in the sandbox.
 
-1. **Predicting future Units Sold** and **Demand Forecast** for different products across stores.
-2. **Evaluating a wide range of machine learning, deep learning, and time series models** for both sales and demand forecasting.
-3. **Comparing model performances** using evaluation metrics such as MAE, MSE, RMSE, and R².
-4. **Understanding the impact of external factors** like weather and promotions on sales and demand trends.
+`Deployment` remains a compatibility entry point (`streamlit run Deployment`).
 
----
+## Notebook
 
-##  Models Used
+`notebooks/Sales_Forecasting_and_Demand_Prediction.ipynb` is a clean, output-free companion demonstrating the same data checks, chronological split, and train-only preprocessing. It requires a real dataset via `SALES_DATA_PATH` (or `--data` in the CLI); it intentionally stops when the dataset is absent.
 
-The project involves using a combination of **machine learning models**, **deep learning models**, and **time series models** for sales and demand forecasting. Below is the detailed list of models used:
+## Validation
 
-###  **Machine Learning Models**
-- `XGBRegressor - Units Sold`
-- `XGBRegressor - Demand Forecast`
-- `RandomForestRegressor - Units Sold`
-- `RandomForestRegressor - Demand Forecast`
-- `GradientBoostingRegressor - Units Sold`
-- `GradientBoostingRegressor - Demand Forecast`
-- `SVR - Units Sold`
-- `SVR - Demand Forecast`
-- `Ridge Regression - Units Sold`
-- `Ridge Regression - Demand Forecast`
+```bash
+ruff check .
+python -m unittest discover -s tests -v
+python -m compileall -q .
+python "ML flow.py"   # expected to stop because no data path was provided
+```
 
-###  **Deep Learning Models**
-- `MLP - Sales Prediction`
-- `MLP - Demand Forecast Prediction`
-- `LSTM - Sales Prediction`
-- `LSTM - Demand Forecast Prediction`
-- `BiLSTM - Sales Prediction`
-- `BiLSTM - Demand Forecast Prediction`
-- `CNN - Sales Prediction`
-- `CNN - Demand Forecast Prediction`
-- `CNN+LSTM - Sales Prediction`
-- `CNN+LSTM - Demand Forecast Prediction`
-- `BiLSTM+CNN - Sales Prediction`
-- `BiLSTM+CNN - Demand Forecast Prediction`
-
-###  **Time Series Models**
-- `Prophet - Units Sold`
-- `Prophet - Demand Forecast`
-- `ARIMA - Units Sold`
-- `ARIMA - Demand Forecast`
-- `SARIMAX - Units Sold`
-- `SARIMAX - Demand Forecast`
-
----
-
-##  Evaluation Metrics
-
-Models were evaluated using the following metrics:
-
-- **MAE (Mean Absolute Error)**
-- **MSE (Mean Squared Error)**
-- **RMSE (Root Mean Squared Error)**
-- **R² Score**
-
-These metrics help assess model performance in terms of accuracy and error minimization. The higher the R² and the lower the error metrics, the better the model.
-
----
-
-##  Top Model Performance
-
-Here are the best-performing models based on the evaluation metrics:
-
-| Model                            | Target              | MAE      | MSE       | RMSE     | R² Score   |
-|----------------------------------|----------------------|----------|-----------|----------|------------|
-| **MLP**                          | Demand Forecast      | 0.004381 | 0.000037  | 0.006100 | **0.999308** |
-| **BiLSTM + CNN**                 | Sales Prediction     | 0.004398 | 0.000044  | 0.006643 | **0.999232** |
-
->  These two models showed remarkable performance, with near-perfect R² scores, making them the top models for demand and sales forecasting.
-
----
-
-##  Visualizations
-
-To aid in model evaluation and analysis, various visualizations were created:
-
-- **Actual vs Predicted Plots** for both Units Sold and Demand Forecast.
-- **Feature Importance** for machine learning models.
-- **Correlation Heatmaps** to visualize relationships between features.
-- **Sales and Demand Trends** by time, store, and product.
-- **Impact of Holidays and Promotions** on sales and demand.
-
-These visualizations provide insights into model performance and help in interpreting the results of forecasting.
-
----
-
-##  Tools & Libraries
-
-The following tools and libraries were used throughout the project:
-
-- **Data Preprocessing & Analysis**: `Pandas`, `NumPy`
-- **Machine Learning**: `Scikit-learn`, `XGBoost`, `LightGBM`
-- **Deep Learning**: `Keras`, `TensorFlow`, `PyTorch`
-- **Time Series Models**: `Prophet`, `statsmodels`
-- **Visualization**: `Matplotlib`, `Seaborn`, `Plotly`
-- **Notebooks**: Jupyter Notebook
-
----
-
-##  Project Structure
-
-The project is organized into the following structure:
-Sales_Demand_Forecasting/
-
-│
-
-├── datasets/  Raw and processed datasets
-
-├── notebooks/  Comprehensive documentation of the project, more specialized in how it works.
-
-├── Final Doc/  Trained model files
-
-├── src/  Python scripts for preprocessing and modeling
-
-├── visuals/  Plots and figures
-
-└── README.md  Project documentation
+The PDFs and BI/archive files are retained as historical deliverables and were not executed or regenerated. Do not commit local datasets, credentials, MLflow runs, or generated model outputs; `.gitignore` covers these classes.
